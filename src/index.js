@@ -1,8 +1,31 @@
 require("dotenv").config();
 const fastify = require("fastify")({ logger: true });
 
+const productRoutes = require("./routes/product.routes");
+const reviewRoutes = require("./routes/review.routes");
+const sentimentRoutes = require("./routes/sentiment.routes");
+const analyzeRoutes = require("./routes/analyze.routes");
+const statsRoutes = require("./routes/stats.routes");
+const chartRoutes = require("./routes/chart.routes.js");
+
 
 const { knex } = require("./db/database");
+
+fastify.register(require("@fastify/swagger"), {
+  openapi: {
+    info: {
+      title: "Review Monitoring System API",
+      description: "Automatikus review elemzés AI segítségével",
+      version: "1.0.0",
+    },
+  },
+});
+
+fastify.register(require("@fastify/swagger-ui"), {
+  routePrefix: "/docs",
+  exposeRoute: true,
+});
+
 
 const start = async () => {
 
@@ -27,6 +50,12 @@ const start = async () => {
     process.exit(1);
   }
 
+  fastify.register(productRoutes);
+  fastify.register(reviewRoutes);
+  fastify.register(sentimentRoutes);
+  fastify.register(analyzeRoutes);
+  fastify.register(statsRoutes);
+  fastify.register(chartRoutes);
 
   fastify.listen({ port: 5000 }, (err, address) => {
     if (err) {
